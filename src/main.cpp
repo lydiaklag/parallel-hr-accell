@@ -275,8 +275,8 @@ void ComputeHeartRate(){   //here i print the HR
  HR= int(round(Pulse_Rate_next));
  Serial.print("HR: ");
  Serial.print(HR);
+ Serial.print("\n");
 }
-
 
 void setup() {
   // put your setup code here, to run once:
@@ -331,6 +331,7 @@ void setup() {
 }
 
 void loop() {
+
   // put your main code here, to run repeatedly:
   sensors_event_t event; 
   accel.getEvent(&event);
@@ -359,3 +360,14 @@ void loop() {
   }
   flag=1;
 }
+/*
+xTaskCreatePinnedToCore(   //Use xTaskCreate() in vanilla FreeRTOS, now it can run the task in whichever core it wants
+      toggleLED,  // Function to be called
+      "Toggle LED", //Name of task
+      1024,  // Stack size (bytes in ESP32, words in FreeRTOS)
+      NULL, //Parameter to pass to function
+      1,    //Task Priority (0 to configMAX_PRIORITIES - 1)
+      NULL,   //Task handle
+      app_cpu);   //Run on one core for demo purposes (ESP32 only)
+
+      */
