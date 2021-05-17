@@ -308,7 +308,15 @@ void setup() {
   displayRange();
   Serial.println("");
 
-
+//about accel, better create a loop called loopAccel to seperate it from HR
+  xTaskCreatePinnedToCore(
+      loop,
+      "loop of accel",
+      1024,
+      NULL,
+      1, //low priority
+      NULL,
+      1);
 
   //now about the HR MAX30105
   // Initialize sensor
@@ -330,7 +338,7 @@ void setup() {
  
 }
 
-void loop() {
+void loop(void *parameter) {
 
   // put your main code here, to run repeatedly:
   sensors_event_t event; 
@@ -369,5 +377,5 @@ xTaskCreatePinnedToCore(   //Use xTaskCreate() in vanilla FreeRTOS, now it can r
       1,    //Task Priority (0 to configMAX_PRIORITIES - 1)
       NULL,   //Task handle
       app_cpu);   //Run on one core for demo purposes (ESP32 only)
-
+//this one is inside setup
       */
