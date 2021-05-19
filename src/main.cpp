@@ -309,6 +309,7 @@ void setup() {
   Serial.println("");
 
 //about accel, better create a loop called loopAccel to seperate it from HR
+/*
   xTaskCreatePinnedToCore(
       loop,
       "loop of accel",
@@ -317,7 +318,7 @@ void setup() {
       1, //low priority
       NULL,
       1);
-
+*/
   //now about the HR MAX30105
   // Initialize sensor
   if (!Sensor.begin(Wire, I2C_SPEED_FAST)) //Use default I2C port, 400kHz speed
@@ -338,7 +339,7 @@ void setup() {
  
 }
 
-void loop(void *parameter) {
+void loop() {
 
   // put your main code here, to run repeatedly:
   sensors_event_t event; 
@@ -347,6 +348,8 @@ void loop(void *parameter) {
   ADC_Value_y[ii] = float(event.acceleration.y);
   ADC_Value_z[ii] = float(event.acceleration.z);
   Serial.print("X: "); Serial.print(ADC_Value_x[ii]); Serial.print("  ");
+  Serial.print("Y: "); Serial.print(ADC_Value_y[ii]); Serial.print("  ");
+  Serial.print("Z: "); Serial.print(ADC_Value_z[ii]); Serial.print("  ");
   distance[ii]=sqrt( pow(ADC_Value_x[ii], 2) + pow(ADC_Value_y[ii], 2) + pow(ADC_Value_z[ii], 2));
 
   ii++;
