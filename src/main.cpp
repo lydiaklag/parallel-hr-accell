@@ -6,7 +6,12 @@
 #define LED 13
 #include "MAX30105.h"
 #include <FirebaseESP32.h>
+#include <ThingSpeak.h>
 #define debug Serial
+
+#define WIFI_NETWORK "ESP_Test"
+#define WIFI_PASSWORD "esp8266_test"
+#define WIFI_TIMEOUT_MS 20000
 
 // Define signal parameters
 //int Sampling_Time = 20;  //(20ms-->50 samples/sec--> 25 samples/sec for ir & 25 s/sec for red) fs=50 (#sampleRate = 400; & byte sampleAverage = 8 ;)
@@ -48,7 +53,8 @@ void displaySensorDetails();
 void displayDataRate();
 void displayRange();
 void setup();
-void loop();
+void loopHR();
+void loopAccel()
 
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 MAX30105 Sensor; 
@@ -339,22 +345,7 @@ void setup() {
  
 }
 
-void loop() {
-
-  // put your main code here, to run repeatedly:
-  sensors_event_t event; 
-  accel.getEvent(&event);
-  ADC_Value_x[ii] = float(event.acceleration.x);
-  ADC_Value_y[ii] = float(event.acceleration.y);
-  ADC_Value_z[ii] = float(event.acceleration.z);
-  Serial.print("X: "); Serial.print(ADC_Value_x[ii]); Serial.print("  ");
-  Serial.print("Y: "); Serial.print(ADC_Value_y[ii]); Serial.print("  ");
-  Serial.print("Z: "); Serial.print(ADC_Value_z[ii]); Serial.print("  ");
-  distance[ii]=sqrt( pow(ADC_Value_x[ii], 2) + pow(ADC_Value_y[ii], 2) + pow(ADC_Value_z[ii], 2));
-
-  ii++;
-  delay(Sampling_Time);  //fs = 25 Hz. 1/25 = 0.04 = 40msec
-//replace delay with TICKS -> more accurate
+void loopHR() {
 
   //for MAX30105
   //put this part of the code in another loop/task/function with the same priority
@@ -370,6 +361,25 @@ void loop() {
    // ComputeSpO2();  //this function doesnt exist in the code yet
   }
   flag=1;
+}
+
+void loopAccel (){
+  while (1){
+    sensors_event_t event; 
+    accel.getEvent(&event);
+    ADC_Value_x[ii] = float(event.acceleration.x);
+    ADC_Value_y[ii] = float(event.acceleration.y);
+    ADC_Value_z[ii] = float(event.acceleration.z);
+    Serial.print("X: "); Serial.print(ADC_Value_x[ii]); Serial.print("  ");
+    Serial.print("Y: "); Serial.print(ADC_Value_y[ii]); Serial.print("  ");
+    Serial.print("Z: "); Serial.print(ADC_Value_z[ii]); Serial.print("  ");
+    distance[ii]=sqrt( pow(ADC_Value_x[ii], 2) + pow(ADC_Value_y[ii], 2) + pow(ADC_Value_z[ii], 2));
+
+    ii++;
+    //delay(Sampling_Time);  //fs = 25 Hz. 1/25 = 0.04 = 40msec, so Sampling_Time = 40
+    //replace delay with TICKS -> more accurate
+    vTaskDelay (Sampling_Time / portTICK_PERIOD_MS);
+  }
 }
 /*
 xTaskCreatePinnedToCore(   //Use xTaskCreate() in vanilla FreeRTOS, now it can run the task in whichever core it wants
